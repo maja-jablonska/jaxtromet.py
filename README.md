@@ -18,7 +18,7 @@ So far, return all components isn't yet supported -- sorry! I will add that soon
 
 ## astromet.py
 
-Please take a look at the wonderful job done by Zephyr Penoyre and his team.
+Please take a look at the wonderful job done by Zephyr Penoyre and their team.
 
 A simple python package for generating astrometric tracks of single stars and the center of light of unresolved binary, blended and lensed systems. Includes a close emulation of Gaia's astrometric fitting pipeline.
 

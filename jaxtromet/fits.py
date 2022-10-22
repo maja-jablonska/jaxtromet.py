@@ -36,7 +36,7 @@ def downweight(R: jnp.array,
     return w
 
 
-@jit
+#@jit
 def en_fit(R: jnp.array,
            err: jnp.array,
            w: jnp.array) -> jnp.array:
@@ -58,29 +58,31 @@ def en_fit(R: jnp.array,
 
     W_prime = -w / (err ** 2 + y) ** 2
     Q_prime = jnp.sum(R ** 2 * W_prime)
-
+    
     @jit
-    def __loop_body(state):
-        i, y, nu, W, Q, W_prime, Q_prime = state
-        W = w / (err ** 2 + y)
-        Q = jnp.sum(R ** 2 * W)
-        W_prime = -w / (err ** 2 + y) ** 2
-        Q_prime = jnp.sum(R ** 2 * W_prime)
+    def __iterative_y(state):
+        y, nu, W, Q, W_prime, Q_prime = state
+        def __loop_body(x, state):
+            y, nu, W, Q, W_prime, Q_prime = state
+            W = w / (err ** 2 + y)
+            Q = jnp.sum(R ** 2 * W)
+            W_prime = -w / (err ** 2 + y) ** 2
+            Q_prime = jnp.sum(R ** 2 * W_prime)
 
-        y = y + (1 - Q / nu) * Q / Q_prime
-        i += 1
+            y = y + (1 - Q / nu) * Q / Q_prime
 
-        return (i, y, nu, W, Q, W_prime, Q_prime)
-
-    y = jax.lax.while_loop(lambda state: jax.lax.cond(state[0] == 0,
-                                                      lambda x: x[0] < 5,
-                                                      lambda x: jnp.sum(R ** 2 * (w / (err ** 2 + x[1]))) >
-                                                                x[2],
-                                                      state),
-                           __loop_body,
-                           (i, y, nu, W, Q, W_prime, Q_prime))
-
-    return jnp.sqrt(y[1])
+            return (y, nu, W, Q, W_prime, Q_prime)
+        
+        (y, nu, W, Q, W_prime, Q_prime) = lax.fori_loop(0, 4,
+                                                        __loop_body,
+                                                        (y, nu, W, Q, W_prime, Q_prime))
+        
+        return jnp.sqrt(y)
+    
+    return lax.cond(jnp.sum(R**2 * (w/(err**2 + y))) <= nu,
+                    lambda _: 0.,
+                    __iterative_y,
+                    (y, nu, W, Q, W_prime, Q_prime))
 
 
 def agis_2d_prior(ra, dec, G):
@@ -138,6 +140,7 @@ def fit_model(x_obs, x_err, M_matrix, prior):
     # Evaluate weights
     weights = downweight(R, ISR / 2., 0.)
 
+    @jit
     def __loop_body(x, state):
         W, r5d_cov, r5d_mean, R, aen, weights = state
         W = jnp.eye(len(x_obs)) * weights / (x_err ** 2 + aen ** 2)

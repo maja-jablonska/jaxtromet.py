@@ -2,6 +2,14 @@
 
 astromet.py (https://github.com/zpenoyre/astromet.py) rewritten to JAX.
 
+## Install
+
+To install requirements.txt with conda:
+
+```
+conda install -c conda-forge -y --file requirements.txt
+```
+
 ## Main changes from astromet
 
 I tried to make the API as  consistent as possible, and the only changes I have made were due to differences coming from JAX and some computational overhead or complexity they would cause.

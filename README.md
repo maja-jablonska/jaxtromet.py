@@ -10,7 +10,13 @@ To install requirements.txt with conda:
 conda install -c conda-forge -y --file requirements.txt
 ```
 
-In case of problems with jax installation, refer to https://github.com/google/jax and install with pip. Beware of the caveats of using conda and pip install simultaneously: https://www.anaconda.com/blog/using-pip-in-a-conda-environment
+In case of problems with astromet and/or jax installation, refer to https://github.com/google/jax and install with pip. Beware of the caveats of using conda and pip install simultaneously: https://www.anaconda.com/blog/using-pip-in-a-conda-environment.
+
+If you wish to use the conda enivronment's pip, use:
+
+```
+<path/to/conda>/envs/<env-name>/bin/pip install ...
+```
 
 ## Main changes from astromet
 

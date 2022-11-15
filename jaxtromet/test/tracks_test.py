@@ -76,7 +76,7 @@ class TestBlend:
         )
 
     def test_find_etas(self, setUp):
-        astromet_etas = astromet.findEtas(np.array([2014.5, 2014.75]),
+        astromet_etas = astromet.findEtas(np.array([2014.5, 2014.75], dtype=float),
                                           2.,
                                           .5)
 
@@ -103,6 +103,9 @@ class TestBlend:
 
         jaxtromet_binary_motions = binaryMotion(jnp.array([2014.5, 2014.75]),
                                                 2., .9, .9, 10., .5, .9, .9)
+
+        print(list(astromet_binary_motions))
+        print(list(jaxtromet_binary_motions))
 
         assert np.all(
             np.isclose(

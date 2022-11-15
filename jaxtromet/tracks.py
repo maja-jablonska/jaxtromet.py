@@ -1,3 +1,4 @@
+from cmath import cos
 import astropy.coordinates
 import erfa
 import jax.numpy as jnp
@@ -6,6 +7,7 @@ from astropy import constants
 from astropy import units as u
 from astropy.time import Time
 from jax import jit, lax
+import jax
 
 from .lensing import blend, onsky_lens
 
@@ -168,9 +170,9 @@ def design_matrix(ts, bs, ra, dec, phis=None, epoch=2016.0):
 def findEtas(ts: jnp.array,
              period: jnp.float32,
              eccentricity: jnp.float32,
-             tPeri=0) -> jnp.array:
-    """Solve Kepler's equation, E - e sin E = ell, via the contour integration method of Philcox et al. (2021)
-    This uses techniques described in Ullisch (2020) to solve the `geometric goat problem'.
+             tPeri=0,
+             N_it=10) -> jnp.array:
+    """Finds eccentric anomaly with iterative Halley's method
     Args:
         ts (np.ndarray): Times.
         period (float): Period of orbit.
@@ -182,21 +184,37 @@ def findEtas(ts: jnp.array,
     Slightly edited version of code taken from https://github.com/oliverphilcox/Keplers-Goat-Herd
     """
 
-    eta0s = ((2 * jnp.pi / period) * (ts - tPeri)) % (2.0 * jnp.pi)  # (2*np.pi/period)*(ts-tPeri)
-    eta1s = eccentricity * jnp.sin(eta0s)
-    eta2s = (eccentricity ** 2) * jnp.sin(eta0s) * jnp.cos(eta0s)
-    eta3s = (eccentricity ** 3) * jnp.sin(eta0s) * (1 - (3 / 2) * jnp.sin(eta0s) ** 2)
-    return eta0s + eta1s + eta2s + eta3s
+    phase = 2*jnp.pi*(((ts-tPeri)/period)%1)
+    sph = jnp.sin(phase)
+    cph = jnp.cos(phase)
+    eta = phase + eccentricity*sph + (eccentricity**2)*sph*cph + 0.5*(eccentricity**3)*sph*(3*(cph**2)-1)
+
+    def iteration(arg):
+        it, deltaeta, eta = arg
+        it += 1
+        sineta = jnp.sin(eta)
+        coseta = jnp.cos(eta)
+        f = eta - eccentricity*sineta - phase
+        df = 1. - eccentricity*coseta
+        d2f = eccentricity*sineta
+        deltaeta = -f*df / (df*df - 0.5*f*d2f)
+        eta += deltaeta
+        return (it, deltaeta, eta)
+
+        # ((jnp.max(jnp.abs(arg[1]))>1e-5)) &
+
+    eta = lax.while_loop(lambda arg:  arg[0]<N_it, iteration, (0, jnp.array([1., 1.]), eta))
+    return eta[2]
 
 
 @jit
 def bodyPos(pxs, pys, l, q):  # given the displacements transform to c.o.m. frame
-    px1s = pxs * q / (1 + q)
-    px2s = -pxs / (1 + q)
-    py1s = pys * q / (1 + q)
-    py2s = -pys / (1 + q)
-    pxls = -pxs * (l - q) / ((1 + l) * (1 + q))
-    pyls = -pys * (l - q) / ((1 + l) * (1 + q))
+    px1s = -pxs * q / (1 + q)
+    px2s = pxs / (1 + q)
+    py1s = -pys * q / (1 + q)
+    py2s = pys / (1 + q)
+    pxls = pxs * (l - q) / ((1 + l) * (1 + q))
+    pyls = pys * (l - q) / ((1 + l) * (1 + q))
     return px1s, py1s, px2s, py2s, pxls, pyls
 
 

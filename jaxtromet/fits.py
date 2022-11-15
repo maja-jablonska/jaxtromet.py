@@ -219,7 +219,7 @@ def fit(ts, bs, xs, phis, xerr, ra, dec, G=12, epoch=2016.0) -> dict:
     results['chi2'] = jnp.sum(R ** 2 / xerr ** 2)
     results['n_good_obs'] = jnp.sum(weights > 0.2)
     nparam = 5
-    results['UWE'] = jnp.sqrt(jnp.sum(R ** 2 / xerr ** 2) / (jnp.sum(weights > 0.2) - nparam))
+    results['uwe'] = jnp.sqrt(jnp.sum(R ** 2 / xerr ** 2) / (jnp.sum(weights > 0.2) - nparam))
     results['ra_ref'] = ra
     results['dec_ref'] = dec
 
@@ -284,5 +284,5 @@ def gaia_results(results):
     gresults['astrometric_excess_noise'] = results['excess_noise']
     gresults['astrometric_chi2_al'] = results['chi2']
     gresults['astrometric_n_good_obs_al'] = results['n_good_obs']
-    gresults['UWE'] = results['UWE']
+    gresults['uwe'] = results['uwe']
     return gresults

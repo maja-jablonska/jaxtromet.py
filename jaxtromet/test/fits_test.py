@@ -9,39 +9,7 @@ from ..tracks import barycentricPosition
 
 
 class TestBlend:
-    @pytest.fixture()
-    def setUp(self):
-        astromet_params = astromet.define_lens(astromet.params(),
-                                               100.,
-                                               -50.,
-                                               0.5,
-                                               7260.0,
-                                               50.,
-                                               0.25,
-                                               0.2,
-                                               13.5,
-                                               0.75,
-                                               -6.2,
-                                               1.2,
-                                               2.,
-                                               2.5)
-        jaxtromet_params = define_lens(100.,
-                                       -50.,
-                                       0.5,
-                                       7260.0,
-                                       50.,
-                                       0.25,
-                                       0.2,
-                                       0.75,
-                                       -6.2,
-                                       1.2,
-                                       2.,
-                                       2.5)
-        print("setup")
-        yield astromet_params, jaxtromet_params
-        print("teardown")
-
-    def test_downweight(self, setUp):
+    def test_downweight(self):
         astromet_weights = astromet.downweight(np.array([1., 1.]),
                                                np.array([1e-2, 1.2e-2]),
                                                np.array([1e-1, 2e-2]))
@@ -54,13 +22,13 @@ class TestBlend:
             np.isclose(astromet_weights, jaxtromet_weights, 1e-6)
         )
 
-    def test_agis_2d_prior(self, setUp):
+    def test_agis_2d_prior(self):
         astromet_prior = astromet.agis_2d_prior(10., 20., 15.)
         jaxtromet_prior = agis_2d_prior(10., 20., 15.)
 
         assert np.all(np.isclose(astromet_prior, jaxtromet_prior, 1e-6))
 
-    def test_fit(self, setUp):
+    def test_fit(self):
         bs = barycentricPosition(np.array([2014.5, 2014.6]))
         astromet_fit = astromet.fit(np.array([2014.5, 2014.6]),
                                     np.array([1e-2, 1.05e-2]),
@@ -83,7 +51,7 @@ class TestBlend:
                     np.isclose(astromet_fit[k], jaxtromet_fit[k], 1e-6)
             )
 
-    def test_mock_obs(self, setUp):
+    def test_mock_obs(self):
         astromet_mock_obs = astromet.mock_obs(np.array([2014.5, 2014.75]),
                                               np.array([0.75, 0.9]),
                                               np.array([1., 2.]),

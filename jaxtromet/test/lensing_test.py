@@ -7,6 +7,8 @@ from ..lensing import (blend, get_dirs, define_lens,
                        lensed_binary, ulens, get_offset,
                        onsky_lens)
 
+from .utils import *
+
 
 class TestBlend:
     @pytest.fixture()
@@ -168,8 +170,10 @@ class TestBlend:
             )
         )
 
-    def test_offset(self, setUp):
-        astromet_params, jaxtromet_params = setUp
+    @pytest.mark.parametrize("ra,dec", test_ra_dec_data)
+    def test_offset_different_ra_dec(self, ra, dec):
+        astromet_params, jaxtromet_params = generate_lens_params(
+            ra, dec, 0.5, 7200., 40., 0.5, 0.5, 15., 1., 5., 5., 1., 1.)
 
         astromet_params_w_offset = astromet.get_offset(astromet_params,
                                                        0.5,
@@ -191,14 +195,32 @@ class TestBlend:
             1e-6
         )
 
-    '''
-    def onsky_lens(dracs: jnp.array,
-                   ddecs: jnp.array,
-                   dracs_blend: jnp.array,
-                   ddecs_blend: jnp.array,
-                   thetaE: float,
-                   blendl: float) -> Tuple[jnp.array, jnp.array, jnp.array]:
-    '''
+
+    @pytest.mark.parametrize("u0", test_u0_data)
+    def test_offset_different_y0(self, u0):
+        astromet_params, jaxtromet_params = generate_lens_params(
+            10, 10, u0, 7200., 40., 0.5, 0.5, 15., 1., 5., 5., 1., 1.)
+
+        astromet_params_w_offset = astromet.get_offset(astromet_params,
+                                                       0.5,
+                                                       7620.)
+
+        jaxtromet_params_w_offset = get_offset(jaxtromet_params,
+                                               0.5,
+                                               7620.)
+
+        assert np.isclose(
+            astromet_params_w_offset.blenddrac,
+            jaxtromet_params_w_offset.blenddrac,
+            1e-6
+        )
+
+        assert np.isclose(
+            astromet_params_w_offset.blendddec,
+            jaxtromet_params_w_offset.blendddec,
+            1e-6
+        )
+
 
     def test_onsky_lens(self, setUp):
         astromet_lens = astromet.onsky_lens(np.array([1e-1, .5e-1]),

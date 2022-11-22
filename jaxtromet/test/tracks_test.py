@@ -9,21 +9,9 @@ from ..utils import hashdict
 from ..tracks import (totalmass, barycentricPosition, design_matrix,
                       findEtas, binaryMotion, track)
 
-from .utils import generate_lens_params
+from .utils import *
 
 config.update("jax_enable_x64", True)
-
-
-test_ra_dec_data = np.array(np.meshgrid(np.linspace(0, 360., 20), np.linspace(-180, 180., 20))).T.reshape((-1, 2))
-test_u0_data = np.linspace(-10., 10., 20)
-test_t0_data = np.linspace(6000., 8000., 20)
-test_tE_data = np.linspace(0.1, 1000., 20)
-test_pi_data = np.array(np.meshgrid(np.linspace(-1, 1, 20), np.linspace(-1, 1, 20))).T.reshape((-1, 2))
-test_m0_data = np.linspace(10., 20, 20)
-test_fbl_data = np.linspace(0.01, 1., 20)
-test_pm_source_data = np.array(np.meshgrid(np.linspace(-10, 10, 20), np.linspace(-10, 10, 20))).T.reshape((-1, 2))
-test_d_source_data = np.linspace(0.01, 20., 20)
-test_thetaE_data = np.linspace(0.01, 50., 20)
 
 class TestBlend:
 

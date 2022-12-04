@@ -36,7 +36,7 @@ def downweight(R: jnp.array,
     return w
 
 
-#@jit
+@jit
 def en_fit(R: jnp.array,
            err: jnp.array,
            w: jnp.array) -> jnp.array:

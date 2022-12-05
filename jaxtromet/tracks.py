@@ -188,9 +188,10 @@ def findEtas(ts: jnp.array,
     sph = jnp.sin(phase)
     cph = jnp.cos(phase)
     eta = phase + eccentricity*sph + (eccentricity**2)*sph*cph + 0.5*(eccentricity**3)*sph*(3*(cph**2)-1)
+    deltaeta = jnp.ones_like(eta)
 
-    def iteration(arg):
-        it, deltaeta, eta = arg
+    def iteration(carry):
+        it, deltaeta, eta = carry
         it += 1
         sineta = jnp.sin(eta)
         coseta = jnp.cos(eta)
@@ -199,12 +200,12 @@ def findEtas(ts: jnp.array,
         d2f = eccentricity*sineta
         deltaeta = -f*df / (df*df - 0.5*f*d2f)
         eta += deltaeta
-        return (it, deltaeta, eta)
+        return it, deltaeta, eta
 
         # ((jnp.max(jnp.abs(arg[1]))>1e-5)) &
 
-    eta = lax.while_loop(lambda arg:  arg[0]<N_it, iteration, (0, jnp.array([1., 1.]), eta))
-    return eta[2]
+    _, _, eta = lax.while_loop(lambda arg: (jnp.max(jnp.abs(arg[1]))>1e-5) & arg[0]<N_it, iteration, (0, deltaeta, eta))
+    return eta
 
 
 @jit
@@ -235,7 +236,7 @@ def binaryMotion(ts, P, q, l, a, e, vTheta, vPhi, tPeri=0):  # binary position (
     return px1s, py1s, px2s, py2s, pxls, pyls
 
 
-@jit
+#@jit
 def track(ts, bs, ps, comOnly=False):
     """
     Astrometric track in RAcos(Dec) and Dec [mas] for a given binary (or lensing event)
@@ -277,7 +278,7 @@ def track(ts, bs, ps, comOnly=False):
     r5d = jnp.array([ps["drac"], ps["ddec"], ps["parallax"], ps["pmrac"], ps["pmdec"]])
     dracs, ddecs = xij @ r5d  # all in mas
 
-    dracs, ddecs = lax.cond(comOnly == False,
+    dracs, ddecs = lax.cond(comOnly == True,
                             comCorrection,
                             lambda: (dracs, ddecs))
 

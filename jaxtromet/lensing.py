@@ -187,8 +187,8 @@ def define_lens(ra: float,
         - ra                    float - right ascension, deg
         - dec                   float - declination, deg
         - u0                    float - impact parameter - lens-source separation at closest approach in units of the angular Einstein radius
-        - t0                    float - time of closest lens-source approach, reduced JD
-        - tE                    float - timescale of the event, days
+        - t0                    float - time of closest lens-source approach, decimal year
+        - tE                    float - timescale of the event, years
         - piEN                  float - local north component of the microlensing parallax vector
         - piEE                  float - local east component of the microlensing parallax vector
         - fbl                   float - blending parameter (flux from the source / combined flux)
@@ -229,11 +229,6 @@ def define_lens(ra: float,
     # the epoch determines when RA and Dec (and other astrometry)
     # are centred - for dr3 it's 2016.0, dr2 2015.5, dr1 2015.0
     params.epoch = 2016.0
-
-    # conversion to years
-    y = (1.0 * u.year).to(u.day).value
-    t0 = Time(t0 + 2450000, format='jd').decimalyear
-    tE = tE / y
 
     # relative motion
     piE = jnp.sqrt(piEN ** 2 + piEE ** 2)

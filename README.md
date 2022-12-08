@@ -42,6 +42,18 @@ import astropy.units as u
 t_E_jyear = (tE*u.day).to(u.year)
 ```
 
+### mock_obs
+
+errs have to be explicitely passed as an array. Example of generating the errorbars:
+
+```
+mags = # some array of magnitudes from track 
+errs = jaxtromet.sigma_ast(errs)
+```
+
+They can be resampled using gaussians or something.
+
+
 ### fit
 
 Barycentric positions (```bs```) are now calculated for the passed times outside the loop. This can be done using the ```barycentricPosition``` function in jaxtromet. It uses external libraries and therefore cannot be jitted (easily).

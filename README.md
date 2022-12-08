@@ -34,7 +34,8 @@ Example of converting t_0 from reduced JD to decimal year:
 
 Example of converting t_E from days to jyear:
 
-```import astropy.units as u
+```
+import astropy.units as u
 t_E_jyear = (tE*u.day).to(u.year)
 ```
 

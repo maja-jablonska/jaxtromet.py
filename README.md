@@ -30,7 +30,10 @@ I tried to make the API as  consistent as possible, and the only changes I have 
 
 Example of converting t_0 from reduced JD to decimal year:
 
-```t_0_jyear = astropy.time.Time(t_0+2450000., format='jd').jyear```
+```
+from astropy.time import Time
+t_0_jyear = Time(t_0+2450000., format='jd').jyear
+```
 
 Example of converting t_E from days to jyear:
 

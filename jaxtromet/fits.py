@@ -10,7 +10,6 @@ from jax import random
 
 from .tracks import design_matrix_with_phis
 
-key = random.PRNGKey(420)
 T = (1.0 * u.year).to(u.day).value
 
 mas = (1.0 * u.mas).to(u.deg).value

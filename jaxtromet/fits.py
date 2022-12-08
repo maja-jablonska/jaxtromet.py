@@ -231,6 +231,7 @@ def mock_obs(ts: jnp.array,
              phis: jnp.array,
              racs: jnp.array,
              decs: jnp.array,
+             key,
              err=0,
              nmeasure=9) -> tuple:
     """

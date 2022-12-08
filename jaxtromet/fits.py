@@ -230,8 +230,7 @@ def mock_obs(ts: jnp.array,
              phis: jnp.array,
              racs: jnp.array,
              decs: jnp.array,
-             key,
-             err=0,
+             err: jnp.array,
              nmeasure=9) -> tuple:
     """
     Converts positions to comparable observables to real astrometric measurements
@@ -241,7 +240,7 @@ def mock_obs(ts: jnp.array,
         - phis,     jnp.array - Scanning angles (0 north, 90 east), degrees.
         - racs,     jnp.array - RAcosDec at each scan, mas
         - decs,     jnp.array - Dec at each scan, mas
-        - err,      float or jnp.array - optional normal distributed error to be added (default 0)
+        - err,      jnp.array - errors expected for the magnitudes (generate using jaxtromet.sigma_ast(mag))
         - nmeasure, int - optinal, number of measurements per transit (default 9)
     Returns:
         - copies of all entered parameters measured nmeasure times with errors
@@ -249,7 +248,7 @@ def mock_obs(ts: jnp.array,
     """
     ts = jnp.repeat(ts, nmeasure)
     phis = jnp.repeat(phis, nmeasure)
-    errs = err * jax.random.normal(key, shape=ts.shape)
+    errs = jnp.repeat(errs, nmeasure)
     racs = jnp.repeat(racs, nmeasure) + errs * jnp.sin(jnp.deg2rad(phis))
     decs = jnp.repeat(decs, nmeasure) + errs * jnp.cos(jnp.deg2rad(phis))
     xs = racs * jnp.sin(jnp.deg2rad(phis)) + decs * jnp.cos(jnp.deg2rad(phis))

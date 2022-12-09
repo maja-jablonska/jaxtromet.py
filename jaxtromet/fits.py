@@ -231,6 +231,7 @@ def mock_obs(ts: jnp.array,
              racs: jnp.array,
              decs: jnp.array,
              err: jnp.array,
+             key,
              nmeasure=9) -> tuple:
     """
     Converts positions to comparable observables to real astrometric measurements
@@ -248,7 +249,7 @@ def mock_obs(ts: jnp.array,
     """
     ts = jnp.repeat(ts, nmeasure)
     phis = jnp.repeat(phis, nmeasure)
-    errs = jnp.repeat(err, nmeasure)
+    errs = jnp.repeat(err, nmeasure)*jax.random.normal(key, shape=ts.shape)
     racs = jnp.repeat(racs, nmeasure) + errs * jnp.sin(jnp.deg2rad(phis))
     decs = jnp.repeat(decs, nmeasure) + errs * jnp.cos(jnp.deg2rad(phis))
     xs = racs * jnp.sin(jnp.deg2rad(phis)) + decs * jnp.cos(jnp.deg2rad(phis))

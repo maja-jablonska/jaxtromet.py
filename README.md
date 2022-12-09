@@ -22,6 +22,21 @@ If you wish to use the conda enivronment's pip, use:
 
 I tried to make the API as  consistent as possible, and the only changes I have made were due to differences coming from JAX and some computational overhead or complexity they would cause.
 
+### JAX random sampling
+
+pseudo-random numbers work a bit differently in JAX. ensure to create some seed at the beginning, like:
+
+```key = jax.random.PRNGKey(10)```
+
+and **regenerate** a key every step in some loop, if you want to sample.
+
+```
+for ...:
+    key, _ = jax.random.split(key, 2)
+    (...) # pass the key as an argument
+```
+
+
 ### define_lens
 
 - I have ommited the definition of params as a class and using a custom ```dict``` wrapper instead (so params have to be converted to dict: ```dict(params)``` to pass them into functions)
@@ -44,14 +59,12 @@ t_E_jyear = (tE*u.day).to(u.year)
 
 ### mock_obs
 
-errs have to be explicitely passed as an array. Example of generating the errorbars:
+a jax key has to be passed to sample errors (if errors are not zero)
 
 ```
-mags = # some array of magnitudes from track 
-errs = jaxtromet.sigma_ast(errs)
+key, _ = jax.random.split(jax.random.PRNGKey(100), 2)
+t_obs, rac_obs, dec_obs = mock_obs(ts, phis, racs, decs, jaxtromet.sigma_ast(magnitude_0), key)
 ```
-
-They can be resampled using gaussians or something.
 
 
 ### fit

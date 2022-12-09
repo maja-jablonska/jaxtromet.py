@@ -249,7 +249,7 @@ def mock_obs(ts: jnp.array,
     """
     ts = jnp.repeat(ts, nmeasure)
     phis = jnp.repeat(phis, nmeasure)
-    errs = jnp.repeat(err, nmeasure)*jax.random.normal(key, shape=ts.shape)
+    errs = err*jax.random.normal(key, shape=ts.shape)
     racs = jnp.repeat(racs, nmeasure) + errs * jnp.sin(jnp.deg2rad(phis))
     decs = jnp.repeat(decs, nmeasure) + errs * jnp.cos(jnp.deg2rad(phis))
     xs = racs * jnp.sin(jnp.deg2rad(phis)) + decs * jnp.cos(jnp.deg2rad(phis))

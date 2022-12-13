@@ -256,6 +256,37 @@ def mock_obs(ts: jnp.array,
     return ts, xs, phis, racs, decs
 
 
+@jit
+def mock_obs_with_errs(ts: jnp.array,
+                        phis: jnp.array,
+                        racs: jnp.array,
+                        decs: jnp.array,
+                        err: jnp.array,
+                        key,
+                        nmeasure=9) -> tuple:
+    """
+    Converts positions to comparable observables to real astrometric measurements
+    (i.e. 1D positions along some scan angle, optionlly with errors added)
+    Args:
+        - ts,       jnp.array - Observation times, jyear.
+        - phis,     jnp.array - Scanning angles (0 north, 90 east), degrees.
+        - racs,     jnp.array - RAcosDec at each scan, mas
+        - decs,     jnp.array - Dec at each scan, mas
+        - err,      jnp.array - errors expected for the magnitudes (generate using jaxtromet.sigma_ast(mag))
+        - nmeasure, int - optinal, number of measurements per transit (default 9)
+    Returns:
+        - copies of all entered parameters measured nmeasure times with errors
+        - xs        ndarray - 1D projected displacements
+    """
+    ts = jnp.repeat(ts, nmeasure)
+    phis = jnp.repeat(phis, nmeasure)
+    errs = err*jax.random.normal(key, shape=ts.shape)
+    racs = jnp.repeat(racs, nmeasure) + errs * jnp.sin(jnp.deg2rad(phis))
+    decs = jnp.repeat(decs, nmeasure) + errs * jnp.cos(jnp.deg2rad(phis))
+    xs = racs * jnp.sin(jnp.deg2rad(phis)) + decs * jnp.cos(jnp.deg2rad(phis))
+    return ts, xs, phis, racs, decs, errs
+
+
 def gaia_results(results):
     # translates results from full fit into a Gaia specific dictionary
     gresults = {}

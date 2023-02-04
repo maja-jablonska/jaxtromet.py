@@ -6,7 +6,7 @@ except ImportError:
 #from distutils.extension import Extension
 
 setup(name="jaxtromet",
-      version='0.9',
+      version='0.9.1',
       description='One and two body astrometry. Created by Zephyr Penoyre and his team, rewritten to JAX by Maja Jabłońska',
       author='Zephyr Penoyre/rewritten by Maja Jabłońska',
       author_email='majajjablonska@gmail.com',

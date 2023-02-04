@@ -225,7 +225,7 @@ def fit(ts, bs, xs, phis, xerr, ra, dec, G=12, epoch=2016.0) -> dict:
     return results
 
 
-@jit
+@partial(jit, static_argnums=(6,))
 def mock_obs(ts: jnp.array,
              phis: jnp.array,
              racs: jnp.array,

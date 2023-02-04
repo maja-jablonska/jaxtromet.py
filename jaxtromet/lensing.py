@@ -179,7 +179,8 @@ def define_lens(ra: float,
                 pmrac_source: float,
                 pmdec_source: float,
                 d_source: float,
-                thetaE: float):
+                thetaE: float,
+                epoch: float = 2016.):
     """
     Defines astromet parameters using standard microlensing parameters (u0, t0, tE, piEN, piEE, m0, fbl), kinematics of the source and thetaE.
     Args:
@@ -202,6 +203,7 @@ def define_lens(ra: float,
     """
 
     params = hashdict()
+    params.epoch = epoch
 
     params.drac = 0  # mas
     params.ddec = 0  # mas

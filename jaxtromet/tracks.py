@@ -236,7 +236,7 @@ def binaryMotion(ts, P, q, l, a, e, vTheta, vPhi, tPeri=0):  # binary position (
     return px1s, py1s, px2s, py2s, pxls, pyls
 
 
-#@jit
+@jit
 def track(ts, bs, ps, comOnly=False):
     """
     Astrometric track in RAcos(Dec) and Dec [mas] for a given binary (or lensing event)

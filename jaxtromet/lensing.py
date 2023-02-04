@@ -228,10 +228,6 @@ def define_lens(ra: float,
     params.totalmass = -1  # solar mass
     params.Delta = -1
 
-    # the epoch determines when RA and Dec (and other astrometry)
-    # are centred - for dr3 it's 2016.0, dr2 2015.5, dr1 2015.0
-    params.epoch = 2016.0
-
     # relative motion
     piE = jnp.sqrt(piEN ** 2 + piEE ** 2)
     pi_rel = piE * thetaE

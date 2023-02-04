@@ -256,7 +256,7 @@ def mock_obs(ts: jnp.array,
     return ts, xs, phis, racs, decs
 
 
-@jit
+@partial(jit, static_argnums=(6,))
 def mock_obs_with_errs(ts: jnp.array,
                         phis: jnp.array,
                         racs: jnp.array,
